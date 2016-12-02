@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <iostream>
 #include <math.h>
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
@@ -23,84 +24,110 @@ double rotate_x=0;
 // ----------------------------------------------------------
 // função display()
 // ----------------------------------------------------------
+
+class cube
+{
+  public:
+  static void draw (GLfloat L)
+  {
+    //FRONT
+    glBegin(GL_QUADS);
+    glVertex3f(  L, -L, -L );      // P1 is red
+    glVertex3f(  L,  L, -L );      // P2 is green
+    glVertex3f( -L,  L, -L );      // P3 is blue
+    glVertex3f( -L, -L, -L );      // P4 is purple
+    glEnd();
+    //BACK
+    glBegin(GL_QUADS);
+    glVertex3f(  L, -L, L );
+    glVertex3f(  L,  L, L );
+    glVertex3f( -L,  L, L );
+    glVertex3f( -L, -L, L );
+    glEnd();
+    //RIGHT
+    glBegin(GL_QUADS);
+    glVertex3f( L, -L, -L );
+    glVertex3f( L,  L, -L );
+    glVertex3f( L,  L,  L );
+    glVertex3f( L, -L,  L );
+    glEnd();
+    //LEFT
+    glBegin(GL_QUADS);
+    glVertex3f( -L, -L,  L );
+    glVertex3f( -L,  L,  L );
+    glVertex3f( -L,  L, -L );
+    glVertex3f( -L, -L, -L );
+    glEnd();
+    //TOP
+    glBegin(GL_QUADS);
+    glVertex3f(  L,  L,  L );
+    glVertex3f(  L,  L, -L );
+    glVertex3f( -L,  L, -L );
+    glVertex3f( -L,  L,  L );
+    glEnd();
+    //BOTTOM
+    glBegin(GL_QUADS);
+    glVertex3f(  L, -L, -L );
+    glVertex3f(  L, -L,  L );
+    glVertex3f( -L, -L,  L );
+    glVertex3f( -L, -L, -L );
+    glEnd();
+  }
+};
+
 void display(){
 
-  //  Limpa a tela e o Z-Buffer
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-  // Reinicia transformações
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
+   //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
+  gluPerspective(60.0, 1.0, 0.5, 50.0);
+ // glFrustum(-7.0, 7.0, -5.0, 5.0, -3.0, 3.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  gluLookAt(10, 15, 30, 0.0, 0.0, -10.0, 0.0, 1.0, 0.0);
 
-  // Outras Transformações
-  // glTranslatef( 0.1, 0.0, 0.0 );      // Não está incluído
-  // glRotatef( 180, 0.0, 1.0, 0.0 );    // Não está incluído
 
-  // Rotaciona quando o usuário muda rotate_x e rotate_y
-  glRotatef( rotate_x, 1.0, 0.0, 0.0 );
-  glRotatef( rotate_y, 0.0, 1.0, 0.0 );
+// scale for the table 14, 0.5, 8
 
-  // Outras Transformações
-  // glScalef( 2.0, 2.0, 0.0 );          // Não está incluído
 
-  //Lado multicolorido - FRENTE
- glBegin(GL_POLYGON);
+  // LEGS
 
-  glColor3f( 1.0, 0.0, 0.0 );     glVertex3f(  0.5, -0.5, -0.5 );      // P1 é vermelho
-  glColor3f( 0.0, 1.0, 0.0 );     glVertex3f(  0.5,  0.5, -0.5 );      // P2 é verde
-  glColor3f( 0.0, 0.0, 1.0 );     glVertex3f( -0.5,  0.5, -0.5 );      // P3 é azul
-  glColor3f( 1.0, 0.0, 1.0 );     glVertex3f( -0.5, -0.5, -0.5 );      // P4 é roxo
+  double legSizeX = 1;
+  double legSizeY = 6;
+  double legSizeZ = 1;
 
-  glEnd();
+  glPushMatrix();  
+  glTranslatef(-5.0, 0, 5.0);  
+  glScalef(legSizeX, legSizeY, legSizeZ);
+  glColor3f(0.8,0.8,0.8);
+  cube::draw(1);
+  glPopMatrix();
 
-  // Lado branco - TRASEIRA
- glBegin(GL_POLYGON);
-  glColor3f(   1.0,  1.0, 1.0 );
-  glVertex3f(  0.5, -0.5, 0.5 );
-  glVertex3f(  0.5,  0.5, 0.5 );
-  glVertex3f( -0.5,  0.5, 0.5 );
-  glVertex3f( -0.5, -0.5, 0.5 );
-  glEnd();
+  glPushMatrix();  
+  glTranslatef(5.0, 0, 5.0);  
+  glScalef(legSizeX, legSizeY, legSizeZ);
+  glColor3f(0.8,0.8,0.8);
+  cube::draw(1);
+  glPopMatrix();
 
-  // Lado roxo - DIREITA
- glBegin(GL_POLYGON);
-  glColor3f(  1.0,  0.0,  1.0 );
-  glVertex3f( 0.5, -0.5, -0.5 );
-  glVertex3f( 0.5,  0.5, -0.5 );
-  glVertex3f( 0.5,  0.5,  0.5 );
-  glVertex3f( 0.5, -0.5,  0.5 );
-  glEnd();
+  glPushMatrix();  
+  glTranslatef(-5.0, 0, -5.0);  
+  glScalef(legSizeX, legSizeY, legSizeZ);
+  glColor3f(0.8,0.8,0.8);
+  cube::draw(1);
+  glPopMatrix();
 
-  // Lado verde - ESQUERDA
- glBegin(GL_POLYGON);
-  glColor3f(   0.0,  1.0,  0.0 );
-  glVertex3f( -0.5, -0.5, 0.5 );
-  glVertex3f( -0.5,  0.5,  0.5 );
-  glVertex3f( -0.5,  0.5, -0.5 );
-  glVertex3f( -0.5, -0.5, -0.5 );
-  glEnd();
-
-  // Lado azul - TOPO
- glBegin(GL_POLYGON);
-  glColor3f(   0.0,  0.0,  1.0 );
-  glVertex3f(  0.5,  0.5,  0.5 );
-  glVertex3f(  0.5,  0.5, -0.5 );
-  glVertex3f( -0.5,  0.5, -0.5 );
-  glVertex3f( -0.5,  0.5,  0.5 );
-  glEnd();
-
-  // Lado vermelho - BASE
- glBegin(GL_POLYGON);
-  glColor3f(   1.0,  0.0,  0.0 );
-  glVertex3f(  0.5, -0.5, -0.5 );
-  glVertex3f(  0.5, -0.5,  0.5 );
-  glVertex3f( -0.5, -0.5, 0.5 );
-  glVertex3f( -0.5, -0.5, -0.5 );
-  glEnd();
+  glPushMatrix();  
+  glTranslatef(5.0, 0, -5.0);  
+  glScalef(legSizeX, legSizeY, legSizeZ);
+  glColor3f(0.8,0.8,0.8);
+  cube::draw(1);
+  glPopMatrix();
 
   glFlush();
-  glutSwapBuffers();
-
 }
+
 
 // ----------------------------------------------------------
 // Função specialKeys()
@@ -135,7 +162,7 @@ int main(int argc, char* argv[]){
   glutInit(&argc,argv);
 
   //  Requisita uma janela com buffer duplo e true color com um Z-buffer
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
   // Cria a janela do programa
   glutCreateWindow("Super Cube");
@@ -148,9 +175,11 @@ int main(int argc, char* argv[]){
   glutSpecialFunc(specialKeys);
 
   //  Passa o controle dos eventos para o GLUT
+  std::cout << "hello";
   glutMainLoop();
 
   //  Retorna para o SO
+  
   return 0;
 
 }
