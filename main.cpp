@@ -9,6 +9,8 @@
 #include <GL/glut.h>
 #endif
 
+double camx, camy, camz;
+
 // ----------------------------------------------------------
 // Declarações de Funções
 // ----------------------------------------------------------
@@ -75,21 +77,7 @@ class cube
   }
 };
 
-void display(){
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-   //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
-  gluPerspective(60.0, 1.0, 0.5, 50.0);
- // glFrustum(-7.0, 7.0, -5.0, 5.0, -3.0, 3.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  gluLookAt(10, 15, 30, 0.0, 0.0, -10.0, 0.0, 1.0, 0.0);
-
-
-// scale for the table 14, 0.5, 8
-
+void drawTable(double x, double y, double z){
 
   // LEGS
 
@@ -98,32 +86,98 @@ void display(){
   double legSizeZ = 1;
 
   glPushMatrix();  
-  glTranslatef(-5.0, 0, 5.0);  
+  glTranslatef(-13.0+x, 0+y, 7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
   glColor3f(0.8,0.8,0.8);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
-  glTranslatef(5.0, 0, 5.0);  
+  glTranslatef(13.0+x, 0+y, 7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
   glColor3f(0.8,0.8,0.8);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
-  glTranslatef(-5.0, 0, -5.0);  
+  glTranslatef(-13.0+x, 0+y, -7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
   glColor3f(0.8,0.8,0.8);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
-  glTranslatef(5.0, 0, -5.0);  
+  glTranslatef(13.0+x, 0+y, -7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
   glColor3f(0.8,0.8,0.8);
   cube::draw(1);
   glPopMatrix();
+
+  // TAMPÃO DA MESA
+  glPushMatrix();  
+  glTranslatef(0+x, 6.5+y, 0+z);  
+  glScalef(14, 0.5, 8);
+  glColor3f(0.5,0,0);
+  cube::draw(1);
+  glPopMatrix();
+
+  // CPU
+  glPushMatrix();  
+  glTranslatef(-10+x, 11+y, -4+z);  
+  glScalef(1, 4, 5);
+  glColor3f(1,1,1);
+  cube::draw(1);
+  glPopMatrix();
+
+  // MONITOR
+  // base
+  glPushMatrix();  
+  glTranslatef(0+x, 7.25+y, -4+z);  
+  glScalef(4, 0.2, 3);
+  glColor3f(1,1,1);
+  cube::draw(1);
+  glPopMatrix();
+
+  // neck
+  glPushMatrix();  
+  glTranslatef(0+x, 11+y, -5+z);  
+  glScalef(1, 4, 1);
+  glColor3f(0.5,0.5,0.5);
+  cube::draw(1);
+  glPopMatrix();
+
+  // neck
+  glPushMatrix();  
+  glTranslatef(0+x, 13+y, -3+z);  
+  glScalef(5, 3.5, 1);
+  glColor3f(1,0,0);
+  cube::draw(1);
+  glPopMatrix();
+
+}
+
+void display(){
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+   //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
+  gluPerspective(60.0, 1.0, 0.5, 50.0);
+  glFrustum(-7.0, 7.0, -5.0, 5.0, -3.0, 3.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  gluLookAt(camx, camy, camz, 0, 0, 0-10, 0.0, 1.0, 0.0);
+
+
+// scale for the table 14, 0.5, 8
+
+
+  
+
+  drawTable(0,0,0);
+  drawTable(5,0,-18);
+  
+
 
   glFlush();
 }
@@ -132,21 +186,31 @@ void display(){
 // ----------------------------------------------------------
 // Função specialKeys()
 // ----------------------------------------------------------
-void specialKeys( int key, int x, int y ) {
+void specialKeys(unsigned char key, int x, int y ) {
 
-  //  Seta direita - aumenta rotação em 5 graus
-  if (key == GLUT_KEY_RIGHT)
-    rotate_y += 5;
-
-  //  Seta para esquerda - diminui a rotação por 5 graus
-  else if (key == GLUT_KEY_LEFT)
-    rotate_y -= 5;
-
-  else if (key == GLUT_KEY_UP)
-    rotate_x += 5;
-
-  else if (key == GLUT_KEY_DOWN)
-    rotate_x -= 5;
+  switch (key)
+  {
+    case 'd': 
+      camx += 1.0;
+      break;
+    case 'a': 
+      camx -= 1.0;
+      break;
+    case 'w': 
+      camy += 1.0;
+      break;
+    case 's': 
+      camy -= 1.0;
+      break;
+    case 'f':
+      camz -= 1.0;
+      break;
+    case 'r':
+      camz += 1.0;
+      break;
+    default: 
+      break;
+  }
 
   //  Requisitar atualização do display
   glutPostRedisplay();
@@ -161,18 +225,22 @@ int main(int argc, char* argv[]){
   //  Inicializa o GLUT e processa os parâmetros do usuário GLUT
   glutInit(&argc,argv);
 
+  camx = 0;
+  camy = 0;
+  camz = 30;
+
   //  Requisita uma janela com buffer duplo e true color com um Z-buffer
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
   // Cria a janela do programa
-  glutCreateWindow("Super Cube");
+  glutCreateWindow("LEC 2");
 
   //  Habilita o teste de profundidade do Z-buffer
   glEnable(GL_DEPTH_TEST);
 
   // Funções
   glutDisplayFunc(display);
-  glutSpecialFunc(specialKeys);
+  glutKeyboardFunc(specialKeys);
 
   //  Passa o controle dos eventos para o GLUT
   std::cout << "hello";
