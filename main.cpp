@@ -88,28 +88,28 @@ void drawTable(double x, double y, double z){
   glPushMatrix();  
   glTranslatef(-13.0+x, 0+y, 7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
-  glColor3f(0.8,0.8,0.8);
+  glColor3f(1, 1, 1);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
   glTranslatef(13.0+x, 0+y, 7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
-  glColor3f(0.8,0.8,0.8);
+  glColor3f(1, 1, 1);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
   glTranslatef(-13.0+x, 0+y, -7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
-  glColor3f(0.8,0.8,0.8);
+  glColor3f(1, 1, 1);
   cube::draw(1);
   glPopMatrix();
 
   glPushMatrix();  
   glTranslatef(13.0+x, 0+y, -7.5+z);  
   glScalef(legSizeX, legSizeY, legSizeZ);
-  glColor3f(0.8,0.8,0.8);
+  glColor3f(1, 1, 1);
   cube::draw(1);
   glPopMatrix();
 
@@ -146,11 +146,19 @@ void drawTable(double x, double y, double z){
   cube::draw(1);
   glPopMatrix();
 
-  // neck
+  // monitor
   glPushMatrix();  
   glTranslatef(0+x, 13+y, -3+z);  
   glScalef(5, 3.5, 1);
   glColor3f(1,0,0);
+  cube::draw(1);
+  glPopMatrix();
+
+  // base
+  glPushMatrix();  
+  glTranslatef(0+x, 7.25+y, 4+z);  
+  glScalef(6, 0.2, 2);
+  glColor3f(1,1,1);
   cube::draw(1);
   glPopMatrix();
 
@@ -161,9 +169,9 @@ void display(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-   //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
+  //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
   gluPerspective(60.0, 1.0, 0.5, 50.0);
-  glFrustum(-7.0, 7.0, -5.0, 5.0, -3.0, 3.0);
+  glFrustum(0, 0, 0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   gluLookAt(camx, camy, camz, 0, 0, 0-10, 0.0, 1.0, 0.0);
@@ -173,6 +181,12 @@ void display(){
 
 
   
+  glPushMatrix();  
+  glTranslatef(0,-6,0);
+  glScalef(100, 0.1, 100);
+  glColor3f(0, 1, 0);
+  cube::draw(1);
+  glPopMatrix();
 
   drawTable(0,0,0);
   drawTable(5,0,-18);
@@ -234,7 +248,7 @@ int main(int argc, char* argv[]){
 
   // Cria a janela do programa
   glutCreateWindow("LEC 2");
-
+  glClearColor(0.7,0.8,1, 1);
   //  Habilita o teste de profundidade do Z-buffer
   glEnable(GL_DEPTH_TEST);
 
