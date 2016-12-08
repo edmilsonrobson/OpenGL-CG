@@ -9,7 +9,7 @@
 #include <GL/glut.h>
 #endif
 
-double camx, camy, camz;
+double camx, camy, camz, lookx, looky;
 
 // ----------------------------------------------------------
 // Declarações de Funções
@@ -18,10 +18,22 @@ void display();
 void specialKeys();
 
 // ----------------------------------------------------------
-// Variáveis Globais
+// Variáveis Globais  
 // ----------------------------------------------------------
 double rotate_y=0;
 double rotate_x=0;
+
+// grey diffuse light
+float diffuse_light [] = {0.4f, 0.4f, 0.4f, 1.0f};
+
+// yellow specular light
+float specular_light [] = {1.0f, 1.0f, 0.0f, 1.0f};
+
+// diffuse material
+float diffuse_material [] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+// specular material
+float specular_material [] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 // ----------------------------------------------------------
 // função display()
@@ -32,8 +44,16 @@ class cube
   public:
   static void draw (GLfloat L)
   {
+
+
+
+    GLfloat d1[] = { 0.2, 0.5, 0.8, 1.0 };
+    GLfloat d2[] = { 0.3, 0.5, 0.6, 1.0 };
+    GLfloat d3[] = { 0.4, 0.2, 0.2, 1.0 };
+
     //FRONT
     glBegin(GL_QUADS);
+    
     glVertex3f(  L, -L, -L );      // P1 is red
     glVertex3f(  L,  L, -L );      // P2 is green
     glVertex3f( -L,  L, -L );      // P3 is blue
@@ -41,6 +61,7 @@ class cube
     glEnd();
     //BACK
     glBegin(GL_QUADS);
+    
     glVertex3f(  L, -L, L );
     glVertex3f(  L,  L, L );
     glVertex3f( -L,  L, L );
@@ -48,6 +69,7 @@ class cube
     glEnd();
     //RIGHT
     glBegin(GL_QUADS);
+    
     glVertex3f( L, -L, -L );
     glVertex3f( L,  L, -L );
     glVertex3f( L,  L,  L );
@@ -55,6 +77,7 @@ class cube
     glEnd();
     //LEFT
     glBegin(GL_QUADS);
+    
     glVertex3f( -L, -L,  L );
     glVertex3f( -L,  L,  L );
     glVertex3f( -L,  L, -L );
@@ -62,6 +85,7 @@ class cube
     glEnd();
     //TOP
     glBegin(GL_QUADS);
+    
     glVertex3f(  L,  L,  L );
     glVertex3f(  L,  L, -L );
     glVertex3f( -L,  L, -L );
@@ -69,6 +93,7 @@ class cube
     glEnd();
     //BOTTOM
     glBegin(GL_QUADS);
+    
     glVertex3f(  L, -L, -L );
     glVertex3f(  L, -L,  L );
     glVertex3f( -L, -L,  L );
@@ -170,11 +195,11 @@ void display(){
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   //glOrtho(-7.0,7.0,-5.0,5.0,-1.0,50.0);
-  gluPerspective(60.0, 1.0, 0.5, 50.0);
-  glFrustum(0, 0, 0, 0.0, 0.0, 0.0);
+  //gluPerspective(60.0, 1.0, 0.5, 50.0);
+  glFrustum(-2.58, 2.58, -1.5, 1.5, 3.0, 600.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(camx, camy, camz, 0, 0, 0-10, 0.0, 1.0, 0.0);
+  gluLookAt(camx, camy, camz, camx+lookx, camy+looky, camz-10, 0.0, 1.0, 0.0);
 
 
 // scale for the table 14, 0.5, 8
@@ -190,7 +215,8 @@ void display(){
 
   drawTable(0,0,0);
   drawTable(5,0,-18);
-  
+    
+  glutSolidSphere (6.0, 20, 16);
 
 
   glFlush();
@@ -217,10 +243,10 @@ void specialKeys(unsigned char key, int x, int y ) {
       camy -= 1.0;
       break;
     case 'f':
-      camz -= 1.0;
+      camz += 1.0;
       break;
     case 'r':
-      camz += 1.0;
+      camz -= 1.0;
       break;
     default: 
       break;
@@ -231,6 +257,29 @@ void specialKeys(unsigned char key, int x, int y ) {
 
 }
 
+void lightning(){
+  // grey diffuse light
+  glLightfv (GL_LIGHT0, GL_DIFFUSE, diffuse_light);
+
+  // yellow specular light
+  glLightfv (GL_LIGHT0, GL_SPECULAR, specular_light);
+
+  
+
+  GLfloat position[] = { -30, 0, -1, 1};
+
+  
+  glLightfv(GL_LIGHT0, GL_POSITION, position);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+
+  glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+  glEnable ( GL_COLOR_MATERIAL ) ;
+
+}
+
+
+
 // ----------------------------------------------------------
 // Função main()
 // ----------------------------------------------------------
@@ -239,9 +288,12 @@ int main(int argc, char* argv[]){
   //  Inicializa o GLUT e processa os parâmetros do usuário GLUT
   glutInit(&argc,argv);
 
+
   camx = 0;
   camy = 0;
   camz = 30;
+  lookx = 0;
+  looky = 0;
 
   //  Requisita uma janela com buffer duplo e true color com um Z-buffer
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
@@ -249,12 +301,46 @@ int main(int argc, char* argv[]){
   // Cria a janela do programa
   glutCreateWindow("LEC 2");
   glClearColor(0.7,0.8,1, 1);
-  //  Habilita o teste de profundidade do Z-buffer
-  glEnable(GL_DEPTH_TEST);
+  glutReshapeWindow(1024,768);
+
 
   // Funções
   glutDisplayFunc(display);
   glutKeyboardFunc(specialKeys);
+
+  glEnable(GL_DEPTH_TEST);
+  lightning();
+
+
+  /*
+
+    //  Habilita o teste de profundidade do Z-buffer
+  
+
+  
+
+   //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+   //GLfloat mat_shininess[] = { 50.0 };
+   GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0};   
+
+   GLfloat light_ambient[] = { 0, 0, 0, 0};
+   //glShadeModel (GL_SMOOTH);
+
+   //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+   //glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+   glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+
+    glEnable (GL_COLOR_MATERIAL);
+    //glColorMaterial (GL_FRONT, GL_DIFFUSE);
+    glColorMaterial (GL_FRONT, GL_SPECULAR);
+
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+   glEnable(GL_DEPTH_TEST);
+   
+*/
+
 
   //  Passa o controle dos eventos para o GLUT
   std::cout << "hello";
