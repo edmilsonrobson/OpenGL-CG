@@ -23,17 +23,6 @@ void specialKeys();
 double rotate_y=0;
 double rotate_x=0;
 
-// grey diffuse light
-float diffuse_light [] = {0.4f, 0.4f, 0.4f, 1.0f};
-
-// yellow specular light
-float specular_light [] = {1.0f, 1.0f, 0.0f, 1.0f};
-
-// diffuse material
-float diffuse_material [] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-// specular material
-float specular_material [] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 // ----------------------------------------------------------
 // função display()
@@ -101,6 +90,54 @@ class cube
     glEnd();
   }
 };
+
+void lightning(){
+  GLfloat luzAmbiente[4]={0.3,0.3,0.3,1.0}; 
+  GLfloat luzDifusa[4]={1,1,1,1};
+  GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho" 
+  GLfloat posicaoLuz[4]={40.0, 50.0, -20.0, 1.0};
+
+  // Capacidade de brilho do material
+  GLfloat especularidade[4]={1.0,1.0,1.0,1.0}; 
+  GLint especMaterial = 60;
+
+  // Especifica que a cor de fundo da janela será preta
+  glClearColor(0.0,0.8,1.0,0.0);
+  
+  // Habilita o modelo de colorização de Gouraud
+  glShadeModel(GL_SMOOTH);
+
+  // Define a refletância do material 
+  glMaterialfv(GL_FRONT,GL_SPECULAR, especularidade);
+  // Define a concentração do brilho
+  glMateriali(GL_FRONT,GL_SHININESS,especMaterial);
+
+  // Ativa o uso da luz ambiente 
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
+
+  // Define os parâmetros da luz de número 0
+  glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente); 
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa );
+  glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular );
+  glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz );
+
+  // Habilita a definição da cor do material a partir da cor corrente
+  glEnable(GL_COLOR_MATERIAL);
+  //Habilita o uso de iluminação
+  glEnable(GL_LIGHTING);  
+  // Habilita a luz de número 0
+  glEnable(GL_LIGHT0);
+
+}
+
+void drawLousa(double x, double y, double z){
+    glPushMatrix();  
+    glTranslatef(x, y, z);
+    glScalef(50, 15, 0.2);
+    glColor3f(1, 1, 1);
+    cube::draw(1);
+    glPopMatrix();
+}
 
 void drawTable(double x, double y, double z){
 
@@ -199,7 +236,7 @@ void display(){
   glFrustum(-2.58, 2.58, -1.5, 1.5, 3.0, 600.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(camx, camy, camz, camx+lookx, camy+looky, camz-10, 0.0, 1.0, 0.0);
+  gluLookAt(camx, camy, camz, camx, camy, camz-10, 0.0, 1.0, 0.0);
 
 
 // scale for the table 14, 0.5, 8
@@ -209,17 +246,26 @@ void display(){
   glPushMatrix();  
   glTranslatef(0,-6,0);
   glScalef(100, 0.1, 100);
-  glColor3f(0, 1, 0);
+  glColor3f(1, 1, 1);
   cube::draw(1);
   glPopMatrix();
 
-  drawTable(0,0,0);
-  drawTable(5,0,-18);
+  drawTable(-30,0,0);
+  drawTable(-30,0,30);
+  drawTable(-30,0,60);
+
+  drawTable(30,0,0);
+  drawTable(30,0,30);
+  drawTable(30,0,60);
+
+  drawLousa(20, 30, -90);
     
-  glutSolidSphere (6.0, 20, 16);
+  //glutSolidSphere (6.0, 20, 16);
 
 
   glFlush();
+
+  
 }
 
 
@@ -257,26 +303,6 @@ void specialKeys(unsigned char key, int x, int y ) {
 
 }
 
-void lightning(){
-  // grey diffuse light
-  glLightfv (GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-
-  // yellow specular light
-  glLightfv (GL_LIGHT0, GL_SPECULAR, specular_light);
-
-  
-
-  GLfloat position[] = { -30, 0, -1, 1};
-
-  
-  glLightfv(GL_LIGHT0, GL_POSITION, position);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-
-  glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
-  glEnable ( GL_COLOR_MATERIAL ) ;
-
-}
 
 
 
@@ -298,18 +324,22 @@ int main(int argc, char* argv[]){
   //  Requisita uma janela com buffer duplo e true color com um Z-buffer
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
+
   // Cria a janela do programa
   glutCreateWindow("LEC 2");
   glClearColor(0.7,0.8,1, 1);
   glutReshapeWindow(1024,768);
 
 
+lightning();
+  
   // Funções
   glutDisplayFunc(display);
+
   glutKeyboardFunc(specialKeys);
 
   glEnable(GL_DEPTH_TEST);
-  lightning();
+  
 
 
   /*
